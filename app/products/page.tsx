@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -30,7 +30,7 @@ interface Category {
   featuredCount: number
 }
 
-export default function ProductsPage() {
+function ProductsPageContent() {
   const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -254,13 +254,13 @@ export default function ProductsPage() {
         <div className="text-center py-12">
           <div className="text-gray-500 mb-4">
             <Filter className="h-16 w-16 mx-auto mb-4" />
-                         <h3 className="text-lg font-medium mb-2">No products found</h3>
-             <p className="text-sm">
-               {selectedCategory && selectedCategory !== "all"
-                 ? `No products found in the "${selectedCategory}" category.`
-                 : "No products match your current filters."
-               }
-             </p>
+            <h3 className="text-lg font-medium mb-2">No products found</h3>
+            <p className="text-sm">
+              {selectedCategory && selectedCategory !== "all"
+                ? `No products found in the "${selectedCategory}" category.`
+                : "No products match your current filters."
+              }
+            </p>
           </div>
           <Button onClick={clearFilters} variant="outline">
             Clear Filters
@@ -268,5 +268,42 @@ export default function ProductsPage() {
         </div>
       )}
     </div>
+  )
+}
+
+function ProductsPageFallback() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">All Products</h1>
+            <p className="text-gray-600">Discover our amazing collection of products</p>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {[...Array(8)].map((_, index) => (
+          <Card key={index} className="animate-pulse">
+            <CardContent className="p-0">
+              <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+              <div className="p-4 space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-200 rounded w-full"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<ProductsPageFallback />}>
+      <ProductsPageContent />
+    </Suspense>
   )
 }
