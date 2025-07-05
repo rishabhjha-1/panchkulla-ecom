@@ -20,7 +20,7 @@ interface Product {
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    const apiUrl = `http://localhost:3000/api/products?featured=true&limit=4`
+    const apiUrl = `https://panchkulla-ecom.vercel.app/api/products?featured=true&limit=4`
     console.log('Fetching featured products from:', apiUrl)
     
     const res = await fetch(apiUrl, {
@@ -37,7 +37,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
       // If no featured products found, try to get some regular products as fallback
       if (!data.products || data.products.length === 0) {
         console.log('No featured products found, fetching regular products as fallback')
-        const fallbackRes = await fetch(`http://localhost:3000/api/products?limit=4`, {
+        const fallbackRes = await fetch(`https://panchkulla-ecom.vercel.app/api/products?limit=4`, {
           cache: 'no-store'
         })
         
