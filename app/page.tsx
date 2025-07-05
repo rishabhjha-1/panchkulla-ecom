@@ -20,16 +20,55 @@ interface Product {
 
 async function getFeaturedProducts(): Promise<Product[]> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products?featured=true&limit=4`, {
+    const apiUrl = `http://localhost:3000/api/products?featured=true&limit=4`
+    console.log('Fetching featured products from:', apiUrl)
+    
+    const res = await fetch(apiUrl, {
       cache: 'no-store'
     })
     
+    console.log('API response status:', res.status)
+    
     if (res.ok) {
       const data = await res.json()
+      console.log('API response data:', data)
+      console.log('Featured products found:', data.products?.length || 0)
+      
+      // If no featured products found, try to get some regular products as fallback
+      if (!data.products || data.products.length === 0) {
+        console.log('No featured products found, fetching regular products as fallback')
+        const fallbackRes = await fetch(`http://localhost:3000/api/products?limit=4`, {
+          cache: 'no-store'
+        })
+        
+        if (fallbackRes.ok) {
+          const fallbackData = await fallbackRes.json()
+          console.log('Fallback products found:', fallbackData.products?.length || 0)
+          return fallbackData.products || []
+        }
+      }
+      
       return data.products || []
+    } else {
+      console.error('API request failed with status:', res.status)
+      const errorText = await res.text()
+      console.error('API error response:', errorText)
+      
+      // Try fallback to regular products
+      console.log('Trying fallback to regular products')
+      const fallbackRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products?limit=4`, {
+        cache: 'no-store'
+      })
+      
+      if (fallbackRes.ok) {
+        const fallbackData = await fallbackRes.json()
+        console.log('Fallback products found:', fallbackData.products?.length || 0)
+        return fallbackData.products || []
+      }
+      
+      return []
     }
     
-    return []
   } catch (error) {
     console.error('Error fetching featured products:', error)
     return []
@@ -38,6 +77,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
 
 export default async function Home() {
   const featuredProducts = await getFeaturedProducts()
+  const isShowingFeatured = featuredProducts.some(product => product.featured)
   
   return (
     <div className="min-h-screen">
@@ -208,10 +248,17 @@ export default async function Home() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
               <Star className="h-4 w-4" />
-              Best Sellers
+              {isShowingFeatured ? 'Best Sellers' : 'Popular Products'}
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Featured Products</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">Discover our most popular and trending items, carefully selected for quality and value</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+              {isShowingFeatured ? 'Featured Products' : 'Popular Products'}
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              {isShowingFeatured 
+                ? 'Discover our most popular and trending items, carefully selected for quality and value'
+                : 'Explore our curated collection of high-quality products'
+              }
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -270,58 +317,31 @@ export default async function Home() {
                 </Card>
               ))
             ) : (
-              // Fallback to mock products if no featured products found
-              [1, 2, 3, 4].map((i) => (
-                <Card key={i} className="group hover-lift animate-scale-in">
-                  <CardContent className="p-0">
-                    <div className="relative">
-                      <Image
-                        src={`/placeholder.svg?height=250&width=250`}
-                        alt={`Product ${i}`}
-                        width={250}
-                        height={250}
-                        className="w-full h-48 object-cover rounded-t-lg"
-                      />
-                      <Badge className="absolute top-2 left-2 bg-red-500">Sale</Badge>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-2">Premium Product {i}</h3>
-                      <div className="flex items-center mb-2">
-                        {[...Array(5)].map((_, j) => (
-                          <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        ))}
-                        <span className="text-sm text-gray-500 ml-2">(4.8)</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-lg font-bold text-blue-600">₹{999 + i * 100}</span>
-                          <span className="text-sm text-gray-500 line-through ml-2">₹{1299 + i * 100}</span>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                        <AddToCartButton
-                          product={{
-                            id: `product-${i}`,
-                            name: `Premium Product ${i}`,
-                            price: 999 + i * 100,
-                            image: `/placeholder.svg?height=250&width=250`,
-                          }}
-                          size="sm"
-                        />
-                         <Link href={`/products/1`}>
-                            <Button size="sm" variant="outline">View Details</Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+              // Show message when no featured products are found
+              <div className="col-span-full text-center py-12">
+                <div className="max-w-md mx-auto">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Star className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Featured Products Available</h3>
+                  <p className="text-gray-600 mb-6">
+                    We're currently updating our featured products. Check back soon for our latest selections!
+                  </p>
+                  <Link href="/products">
+                    <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-0 hover:from-blue-700 hover:to-purple-700">
+                      Browse All Products
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             )}
           </div>
 
           <div className="text-center mt-12">
             <Link href="/products">
-              <Button size="lg">View All Products</Button>
+              <Button size="lg">
+                {isShowingFeatured ? 'View All Products' : 'Browse All Products'}
+              </Button>
             </Link>
           </div>
         </div>
