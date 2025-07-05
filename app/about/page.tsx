@@ -49,19 +49,19 @@ export default function AboutPage() {
 
   const team = [
     {
-      name: "Rahul Sharma",
+      name: "ABC",
       role: "Founder & CEO",
       image: "/placeholder-user.jpg",
       description: "Passionate about creating the best shopping experience for customers.",
     },
     {
-      name: "Priya Patel",
+      name: "ABCe",
       role: "Head of Operations",
       image: "/placeholder-user.jpg",
       description: "Ensuring smooth operations and excellent customer service.",
     },
     {
-      name: "Amit Kumar",
+      name: "ABCd",
       role: "Head of Technology",
       image: "/placeholder-user.jpg",
       description: "Building innovative solutions to enhance your shopping experience.",

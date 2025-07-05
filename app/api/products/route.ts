@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get("category")
     const featured = searchParams.get("featured")
+    const sort = searchParams.get("sort") || "newest"
     const limit = Number.parseInt(searchParams.get("limit") || "12")
     const page = Number.parseInt(searchParams.get("page") || "1")
 
@@ -22,10 +23,29 @@ export async function GET(request: NextRequest) {
       query.featured = true
     }
 
+    // Define sort options
+    let sortOption: any = { createdAt: -1 } // default: newest first
+    
+    switch (sort) {
+      case "price-low":
+        sortOption = { price: 1 }
+        break
+      case "price-high":
+        sortOption = { price: -1 }
+        break
+      case "name":
+        sortOption = { name: 1 }
+        break
+      case "newest":
+      default:
+        sortOption = { createdAt: -1 }
+        break
+    }
+
     const products = await Product.find(query)
       .limit(limit)
       .skip((page - 1) * limit)
-      .sort({ createdAt: -1 })
+      .sort(sortOption)
 
     const total = await Product.countDocuments(query)
 
