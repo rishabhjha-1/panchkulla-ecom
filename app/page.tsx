@@ -250,6 +250,7 @@ export default async function Home() {
                             <span className="text-sm text-gray-500 line-through ml-2">₹{product.originalPrice}</span>
                           )}
                         </div>
+                        <div className="flex flex-col gap-2">
                         <AddToCartButton
                           product={{
                             id: product._id,
@@ -259,6 +260,10 @@ export default async function Home() {
                           }}
                           size="sm"
                         />
+                         <Link href={`/products/${product._id}`}>
+                            <Button size="sm" variant="outline">View Details</Button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -292,6 +297,7 @@ export default async function Home() {
                           <span className="text-lg font-bold text-blue-600">₹{999 + i * 100}</span>
                           <span className="text-sm text-gray-500 line-through ml-2">₹{1299 + i * 100}</span>
                         </div>
+                        <div className="flex flex-col gap-2">
                         <AddToCartButton
                           product={{
                             id: `product-${i}`,
@@ -301,6 +307,10 @@ export default async function Home() {
                           }}
                           size="sm"
                         />
+                         <Link href={`/products/1`}>
+                            <Button size="sm" variant="outline">View Details</Button>
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
