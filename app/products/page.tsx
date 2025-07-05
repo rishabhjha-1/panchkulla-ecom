@@ -6,31 +6,34 @@ import Link from "next/link"
 import { Star } from "lucide-react"
 import { AddToCartButton } from "@/components/AddToCartButton"
 
-async function getProducts() {
-  // In a real app, this would fetch from your API
-  return [
-    {
-      id: "1",
-      name: "Premium Wireless Headphones",
-      description: "High-quality wireless headphones with noise cancellation",
-      price: 2999,
-      originalPrice: 3999,
-      images: ["/placeholder.svg?height=300&width=300"],
-      category: "Electronics",
-      featured: true,
-    },
-    {
-      id: "2",
-      name: "Smart Fitness Watch",
-      description: "Track your fitness goals with this advanced smartwatch",
-      price: 4999,
-      originalPrice: 6999,
-      images: ["/placeholder.svg?height=300&width=300"],
-      category: "Electronics",
-      featured: false,
-    },
-    // Add more products...
-  ]
+interface Product {
+  _id: string
+  name: string
+  description: string
+  price: number
+  originalPrice?: number
+  images: string[]
+  category: string
+  featured: boolean
+  status: string
+}
+
+async function getProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products`, {
+      cache: 'no-store'
+    })
+    
+    if (res.ok) {
+      const data = await res.json()
+      return data.products || []
+    }
+    
+    return []
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    return []
+  }
 }
 
 export default async function ProductsPage() {
@@ -45,7 +48,7 @@ export default async function ProductsPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product) => (
-          <Card key={product.id} className="group hover:shadow-lg transition-shadow">
+          <Card key={product._id} className="group hover:shadow-lg transition-shadow">
             <CardContent className="p-0">
               <div className="relative">
                 <Image
@@ -55,7 +58,7 @@ export default async function ProductsPage() {
                   height={300}
                   className="w-full h-48 object-cover rounded-t-lg"
                 />
-                {product.originalPrice > product.price && (
+                {product.originalPrice && product.originalPrice > product.price && (
                   <Badge className="absolute top-2 left-2 bg-red-500">
                     {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
                   </Badge>
@@ -74,21 +77,21 @@ export default async function ProductsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-lg font-bold text-blue-600">₹{product.price}</span>
-                    {product.originalPrice > product.price && (
+                    {product.originalPrice && product.originalPrice > product.price && (
                       <span className="text-sm text-gray-500 line-through ml-2">₹{product.originalPrice}</span>
                     )}
                   </div>
                   <div className="flex gap-2">
                     <AddToCartButton
                       product={{
-                        id: product.id,
+                        id: product._id,
                         name: product.name,
                         price: product.price,
                         image: product.images[0] || "/placeholder.svg",
                       }}
                       size="sm"
                     />
-                    <Link href={`/products/${product.id}`}>
+                    <Link href={`/products/${product._id}`}>
                       <Button size="sm" variant="outline">View Details</Button>
                     </Link>
                   </div>

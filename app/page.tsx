@@ -6,7 +6,39 @@ import Image from "next/image"
 import { Star, Truck, Shield, Headphones } from "lucide-react"
 import { AddToCartButton } from "@/components/AddToCartButton"
 
-export default function Home() {
+interface Product {
+  _id: string
+  name: string
+  description: string
+  price: number
+  originalPrice?: number
+  images: string[]
+  category: string
+  featured: boolean
+  status: string
+}
+
+async function getFeaturedProducts(): Promise<Product[]> {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/products?featured=true&limit=4`, {
+      cache: 'no-store'
+    })
+    
+    if (res.ok) {
+      const data = await res.json()
+      return data.products || []
+    }
+    
+    return []
+  } catch (error) {
+    console.error('Error fetching featured products:', error)
+    return []
+  }
+}
+
+export default async function Home() {
+  const featuredProducts = await getFeaturedProducts()
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -82,46 +114,98 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="group hover:shadow-lg transition-shadow">
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <Image
-                      src={`/placeholder.svg?height=250&width=250`}
-                      alt={`Product ${i}`}
-                      width={250}
-                      height={250}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <Badge className="absolute top-2 left-2 bg-red-500">Sale</Badge>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-2">Premium Product {i}</h3>
-                    <div className="flex items-center mb-2">
-                      {[...Array(5)].map((_, j) => (
-                        <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      ))}
-                      <span className="text-sm text-gray-500 ml-2">(4.8)</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-lg font-bold text-blue-600">₹{999 + i * 100}</span>
-                        <span className="text-sm text-gray-500 line-through ml-2">₹{1299 + i * 100}</span>
-                      </div>
-                      <AddToCartButton
-                        product={{
-                          id: `product-${i}`,
-                          name: `Premium Product ${i}`,
-                          price: 999 + i * 100,
-                          image: `/placeholder.svg?height=250&width=250`,
-                        }}
-                        size="sm"
+            {featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <Card key={product._id} className="group hover:shadow-lg transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <Image
+                        src={product.images[0] || "/placeholder.svg"}
+                        alt={product.name}
+                        width={250}
+                        height={250}
+                        className="w-full h-48 object-cover rounded-t-lg"
                       />
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <Badge className="absolute top-2 left-2 bg-red-500">
+                          {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
+                        </Badge>
+                      )}
+                      {product.featured && <Badge className="absolute top-2 right-2 bg-blue-500">Featured</Badge>}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
+                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.description}</p>
+                      <div className="flex items-center mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                        <span className="text-sm text-gray-500 ml-2">(4.8)</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-lg font-bold text-blue-600">₹{product.price}</span>
+                          {product.originalPrice && product.originalPrice > product.price && (
+                            <span className="text-sm text-gray-500 line-through ml-2">₹{product.originalPrice}</span>
+                          )}
+                        </div>
+                        <AddToCartButton
+                          product={{
+                            id: product._id,
+                            name: product.name,
+                            price: product.price,
+                            image: product.images[0] || "/placeholder.svg",
+                          }}
+                          size="sm"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              // Fallback to mock products if no featured products found
+              [1, 2, 3, 4].map((i) => (
+                <Card key={i} className="group hover:shadow-lg transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <Image
+                        src={`/placeholder.svg?height=250&width=250`}
+                        alt={`Product ${i}`}
+                        width={250}
+                        height={250}
+                        className="w-full h-48 object-cover rounded-t-lg"
+                      />
+                      <Badge className="absolute top-2 left-2 bg-red-500">Sale</Badge>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-2">Premium Product {i}</h3>
+                      <div className="flex items-center mb-2">
+                        {[...Array(5)].map((_, j) => (
+                          <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        ))}
+                        <span className="text-sm text-gray-500 ml-2">(4.8)</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-lg font-bold text-blue-600">₹{999 + i * 100}</span>
+                          <span className="text-sm text-gray-500 line-through ml-2">₹{1299 + i * 100}</span>
+                        </div>
+                        <AddToCartButton
+                          product={{
+                            id: `product-${i}`,
+                            name: `Premium Product ${i}`,
+                            price: 999 + i * 100,
+                            image: `/placeholder.svg?height=250&width=250`,
+                          }}
+                          size="sm"
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
 
           <div className="text-center mt-12">
