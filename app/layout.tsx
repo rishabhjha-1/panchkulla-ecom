@@ -11,8 +11,8 @@ import { SessionDebug } from "@/components/SessionDebug"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Panchkula - Premium Ecommerce Store",
-  description: "Discover amazing products at Panchkula - Your trusted online shopping destination",
+  title: "Punchakshri - Premium Ecommerce Store",
+  description: "Discover amazing products at Punchakshri - Your trusted online shopping destination",
     generator: 'v0.dev'
 }
 

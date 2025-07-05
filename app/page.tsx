@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
-import { Star, Truck, Shield, Headphones } from "lucide-react"
+import { Star, Truck, Shield, Headphones, ArrowRight, ShoppingBag, Heart, Zap } from "lucide-react"
 import { AddToCartButton } from "@/components/AddToCartButton"
 
 interface Product {
@@ -45,23 +45,28 @@ export default async function Home() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">Welcome to Panchkula</h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
+              Welcome to <span className="text-yellow-300">Punchakshri</span>
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-blue-100 animate-fade-in-delay">
               Discover premium products with exceptional quality and service
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-delay-2">
               <Link href="/products">
-                <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+                <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 group hover:scale-105 transition-transform">
+                  <ShoppingBag className="mr-2 h-5 w-5" />
                   Shop Now
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/categories">
+              <Link href="/about">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+                  className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent group hover:scale-105 transition-transform"
                 >
-                  Browse Categories
+                  Learn More
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
             </div>
@@ -73,7 +78,7 @@ export default async function Home() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Panchkula?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Punchakshri?</h2>
             <p className="text-lg text-gray-600">Experience the best in online shopping</p>
           </div>
 
@@ -116,7 +121,7 @@ export default async function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.length > 0 ? (
               featuredProducts.map((product) => (
-                <Card key={product._id} className="group hover:shadow-lg transition-shadow">
+                <Card key={product._id} className="group hover-lift animate-scale-in">
                   <CardContent className="p-0">
                     <div className="relative">
                       <Image
@@ -166,7 +171,7 @@ export default async function Home() {
             ) : (
               // Fallback to mock products if no featured products found
               [1, 2, 3, 4].map((i) => (
-                <Card key={i} className="group hover:shadow-lg transition-shadow">
+                <Card key={i} className="group hover-lift animate-scale-in">
                   <CardContent className="p-0">
                     <div className="relative">
                       <Image

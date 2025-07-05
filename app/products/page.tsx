@@ -16,6 +16,7 @@ interface Product {
   category: string
   featured: boolean
   status: string
+  stock: number
 }
 
 async function getProducts(): Promise<Product[]> {
@@ -47,8 +48,8 @@ export default async function ProductsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <Card key={product._id} className="group hover:shadow-lg transition-shadow">
+        {products.map((product, index) => (
+          <Card key={product._id} className="group hover-lift animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
             <CardContent className="p-0">
               <div className="relative">
                 <Image
@@ -76,9 +77,9 @@ export default async function ProductsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-lg font-bold text-blue-600">₹{product.price}</span>
+                    <span className="text-lg font-bold text-blue-600">₹{product.price.toLocaleString()}</span>
                     {product.originalPrice && product.originalPrice > product.price && (
-                      <span className="text-sm text-gray-500 line-through ml-2">₹{product.originalPrice}</span>
+                      <span className="text-sm text-gray-500 line-through ml-2">₹{product.originalPrice.toLocaleString()}</span>
                     )}
                   </div>
                   <div className="flex gap-2">
@@ -95,6 +96,12 @@ export default async function ProductsPage() {
                       <Button size="sm" variant="outline">View Details</Button>
                     </Link>
                   </div>
+                </div>
+                {/* Stock Information */}
+                <div className="mt-2 text-sm">
+                  <span className={`font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {product.stock > 0 ? `${product.stock} pieces left` : 'Out of Stock'}
+                  </span>
                 </div>
               </div>
             </CardContent>
