@@ -52,6 +52,9 @@ export function Navbar() {
               <Link href="/products" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Products
               </Link>
+              <Link href="/virtual-try-on" className="text-gray-700 hover:text-blue-600 transition-colors">
+                Virtual Try-On
+              </Link>
               <Link href="/categories" className="text-gray-700 hover:text-blue-600 transition-colors">
                 Categories
               </Link>
@@ -161,6 +164,13 @@ export function Navbar() {
               onClick={closeMobileMenu}
             >
               📦 Products
+            </Link>
+            <Link 
+              href="/virtual-try-on" 
+              className="block px-3 py-3 text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors border border-gray-100"
+              onClick={closeMobileMenu}
+            >
+              📷 Virtual Try-On
             </Link>
             <Link 
               href="/categories" 

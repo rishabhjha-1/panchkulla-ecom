@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react"
 import { useCart } from "@/app/context/CartContext"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
+import { useAnalytics } from "@/hooks/use-analytics"
 import { ShoppingCart } from "lucide-react"
 
 interface AddToCartButtonProps {
@@ -22,6 +23,7 @@ export function AddToCartButton({ product, size = "sm", className }: AddToCartBu
   const { data: session } = useSession()
   const { dispatch } = useCart()
   const { toast } = useToast()
+  const { trackAddToCart } = useAnalytics()
   const [loading, setLoading] = useState(false)
 
   const handleAddToCart = async () => {
@@ -60,6 +62,9 @@ export function AddToCartButton({ product, size = "sm", className }: AddToCartBu
       })
 
       if (response.ok) {
+        // Track the add to cart event
+        trackAddToCart(product.id, product.name, product.price, 1)
+        
         toast({
           title: "Added to Cart",
           description: `${product.name} has been added to your cart`,

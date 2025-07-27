@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Image from "next/image"
 import Link from "next/link"
-import { Star, Filter, X } from "lucide-react"
+import { Star, Filter, X, Camera } from "lucide-react"
 import { AddToCartButton } from "@/components/AddToCartButton"
+import { VirtualTryOn } from "@/components/VirtualTryOn"
+import { useAnalytics } from "@/hooks/use-analytics"
 
 interface Product {
   _id: string
@@ -32,6 +34,7 @@ interface Category {
 
 function ProductsPageContent() {
   const searchParams = useSearchParams()
+  const { trackProductView, trackSearch } = useAnalytics()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -88,6 +91,14 @@ function ProductsPageContent() {
   useEffect(() => {
     fetchProducts()
   }, [selectedCategory, sortBy])
+
+  // Track search when category or sort changes
+  useEffect(() => {
+    if (products.length > 0) {
+      const searchQuery = selectedCategory !== "all" ? `category: ${selectedCategory}` : "all products"
+      trackSearch(searchQuery, products.length)
+    }
+  }, [selectedCategory, products.length, trackSearch])
 
   const clearFilters = () => {
     setSelectedCategory("all")
@@ -234,8 +245,29 @@ function ProductsPageContent() {
                         }}
                         size="sm"
                       />
+                      <VirtualTryOn
+                        product={{
+                          id: product._id,
+                          name: product.name,
+                          price: product.price,
+                          image: product.images[0] || "/placeholder.svg",
+                          category: product.category,
+                        }}
+                        trigger={
+                          <Button size="sm" variant="outline" className="w-full">
+                            <Camera className="h-4 w-4 mr-2" />
+                            Try On
+                          </Button>
+                        }
+                      />
                       <Link href={`/products/${product._id}`}>
-                        <Button size="sm" variant="outline">View Details</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => trackProductView(product._id, product.name, product.category)}
+                        >
+                          View Details
+                        </Button>
                       </Link>
                     </div>
                   </div>

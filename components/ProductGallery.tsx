@@ -86,12 +86,12 @@ export function ProductGallery({ images, name }: ProductGalleryProps) {
                   : "border-gray-200 hover:border-gray-300"
               )}
             >
-              <Image
+              {/* <Image
                 src={image || "/placeholder.svg"}
                 alt={`${name} thumbnail ${index + 1}`}
                 fill
                 className="object-cover"
-              />
+              /> */}
             </button>
           ))}
         </div>

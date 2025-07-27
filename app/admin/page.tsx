@@ -2,15 +2,22 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Package, ShoppingCart, Users, TrendingUp } from "lucide-react"
+import { Package, ShoppingCart, Users, TrendingUp, Image } from "lucide-react"
 
 export default function AdminDashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    totalOrders: 0,
+    totalUsers: 0,
+    totalRevenue: 0,
+    loading: true
+  })
 
   useEffect(() => {
     if (status === "loading") return
@@ -18,6 +25,40 @@ export default function AdminDashboard() {
       router.push("/")
     }
   }, [session, status, router])
+
+  useEffect(() => {
+    fetchDashboardStats()
+  }, [])
+
+  const fetchDashboardStats = async () => {
+    try {
+      const [productsRes, ordersRes, usersRes] = await Promise.all([
+        fetch('/api/products'),
+        fetch('/api/orders'),
+        fetch('/api/users')
+      ])
+
+      const productsData = await productsRes.json()
+      const ordersData = await ordersRes.json()
+      const usersData = await usersRes.json()
+
+      // Calculate total revenue from orders
+      const totalRevenue = ordersData.orders?.reduce((sum: number, order: any) => {
+        return sum + (order.totalAmount || 0)
+      }, 0) || 0
+
+      setStats({
+        totalProducts: productsData.products?.length || 0,
+        totalOrders: ordersData.orders?.length || 0,
+        totalUsers: usersData.users?.length || 0,
+        totalRevenue: totalRevenue,
+        loading: false
+      })
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error)
+      setStats(prev => ({ ...prev, loading: false }))
+    }
+  }
 
   if (status === "loading") {
     return <div>Loading...</div>
@@ -41,8 +82,12 @@ export default function AdminDashboard() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,234</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">
+              {stats.loading ? "..." : stats.totalProducts.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.loading ? "Loading..." : "Active products in store"}
+            </p>
           </CardContent>
         </Card>
 
@@ -52,8 +97,12 @@ export default function AdminDashboard() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2,350</div>
-            <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+            <div className="text-2xl font-bold">
+              {stats.loading ? "..." : stats.totalOrders.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.loading ? "Loading..." : "Orders processed"}
+            </p>
           </CardContent>
         </Card>
 
@@ -63,19 +112,27 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,234</div>
-            <p className="text-xs text-muted-foreground">+19% from last month</p>
+            <div className="text-2xl font-bold">
+              {stats.loading ? "..." : stats.totalUsers.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.loading ? "Loading..." : "Registered users"}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹45,231</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">
+              {stats.loading ? "..." : `₹${stats.totalRevenue.toLocaleString()}`}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {stats.loading ? "Loading..." : "Total sales revenue"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -124,6 +181,38 @@ export default function AdminDashboard() {
             <Link href="/admin/analytics">
               <Button variant="outline" className="w-full bg-transparent">
                 View Analytics
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Analytics</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Link href="/admin/analytics">
+              <Button className="w-full">View Analytics</Button>
+            </Link>
+            <Link href="/admin/hero-slides">
+              <Button variant="outline" className="w-full bg-transparent">
+                Hero Slider
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Hero Slider Management</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Link href="/admin/hero-slides">
+              <Button className="w-full">Manage Hero Slides</Button>
+            </Link>
+            <Link href="/admin/hero-slides">
+              <Button variant="outline" className="w-full bg-transparent">
+                Add New Slide
               </Button>
             </Link>
           </CardContent>

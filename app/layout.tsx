@@ -7,13 +7,13 @@ import { Navbar } from "./components/Navbar"
 import { Footer } from "./components/Footer"
 import { Toaster } from "@/components/ui/toaster"
 import { SessionDebug } from "@/components/SessionDebug"
+import { Analytics } from '@vercel/analytics/react'
 
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Punchakshri - Premium Ecommerce Store",
-  description: "Discover amazing products at Punchakshri - Your trusted online shopping destination",
-    generator: 'v0.dev'
+  title: "Panchkula Ecommerce",
+  description: "Your one-stop shop for all your needs",
 }
 
 export default function RootLayout({
@@ -33,6 +33,7 @@ export default function RootLayout({
           <Toaster />
           <SessionDebug />
         </Providers>
+        <Analytics />
       </body>
     </html>
   )

@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import Image from "next/image"
-import { Star, Truck, Shield, RotateCcw, Package, Heart, Share2 } from "lucide-react"
+import { Star, Truck, Shield, RotateCcw, Package, Heart, Share2, Camera } from "lucide-react"
 import { AddToCartButton } from "@/components/AddToCartButton"
+import { VirtualTryOn } from "@/components/VirtualTryOn"
 import { ProductGallery } from "@/components/ProductGallery"
 import { ProductReviews } from "@/components/ProductReviews"
 import { RelatedProducts } from "@/components/RelatedProducts"
@@ -199,6 +200,21 @@ export default async function ProductDetailPage({ params }: { params: { id: stri
                     }}
                     size="lg"
                     className="flex-1"
+                  />
+                  <VirtualTryOn
+                    product={{
+                      id: product._id,
+                      name: product.name,
+                      price: product.price,
+                      image: product.images[0] || "/placeholder.svg",
+                      category: product.category,
+                    }}
+                    trigger={
+                      <Button variant="outline" size="lg">
+                        <Camera className="h-5 w-5 mr-2" />
+                        Try On
+                      </Button>
+                    }
                   />
                   <Button variant="outline" size="lg">
                     <Heart className="h-5 w-5 mr-2" />

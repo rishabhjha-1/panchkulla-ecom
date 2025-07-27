@@ -14,12 +14,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
+import { useAnalytics } from "@/hooks/use-analytics"
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const { state, dispatch } = useCart()
   const { toast } = useToast()
+  const { trackPurchase } = useAnalytics()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -95,6 +97,10 @@ export default function CheckoutPage() {
 
       if (res.ok) {
         const order = await res.json()
+        
+        // Track the purchase event
+        trackPurchase(order._id, orderData.totalAmount, orderData.items)
+        
         dispatch({ type: "CLEAR_CART" })
         toast({
           title: "Order Placed Successfully!",
