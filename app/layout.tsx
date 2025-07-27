@@ -12,8 +12,35 @@ import { Analytics } from '@vercel/analytics/react'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Panchkula Ecommerce",
-  description: "Your one-stop shop for all your needs",
+  title: "Punchakshri - Premium Ecommerce Store",
+  description: "Discover amazing products at Punchakshri - Your trusted online shopping destination",
+    applicationName: 'Punchakshri',
+    keywords: ['Punchakshri', 'Ecommerce', 'Premium', 'Online Shopping', 'Premium Ecommerce Store'],
+    authors: [{ name: 'Punchakshri', url: 'https://punchakshri.com' }],
+    creator: 'Punchakshri',
+    publisher: 'Punchakshri',
+    openGraph: {
+      title: "Punchakshri - Premium Ecommerce Store",
+      description: "Discover amazing products at Punchakshri - Your trusted online shopping destination",
+      url: 'https://punchakshri.com',
+      siteName: 'Punchakshri',
+      images: [
+        { url: '/og-image.jpg', width: 1200, height: 630, alt: 'Punchakshri' }
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: "Punchakshri - Premium Ecommerce Store",
+      description: "Discover amazing products at Punchakshri - Your trusted online shopping destination",
+      images: ['/og-image.jpg'],
+    },
+    icons: {
+      icon: '/favicon.ico',
+    },
+    manifest: '/site.webmanifest',
+    alternates: {
+      canonical: 'https://punchakshri.com',
+    },  
 }
 
 export default function RootLayout({
